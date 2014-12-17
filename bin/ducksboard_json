@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+require 'trollop'
+require 'ducksboard_json'
+
+
+def strip_heredoc(doc)
+  indent = doc.scan(/^[ \t]*(?=\S)/).min.length
+  doc.gsub(/^[ \t]{#{indent}}/, '')
+end
+
+
+def parse_value(opts)
+  if opts[:ok]
+    0
+  elsif opts[:error]
+    1
+  elsif opts[:warning]
+    2
+  elsif opts[:unknown]
+    3
+  end
+end
+
+
+def parse_opts
+  opts = Trollop::options do
+    banner strip_heredoc(<<-EOS)
+      Create a JSON file which showing the result of a particular job. The
+      resulting file will be /tmp/ducksboard_json/<job_name>.json
+
+      This will be used to populate a dashboard.
+
+      Options:
+    EOS
+    opt :application, 'Application that ran the job', :type => :string, :required => true
+    opt :job, 'The job that ran', :type => :string, :required => true
+    opt :ok, 'Success/failure value will be set to 0'
+    opt :error, 'Success/failure value will be set to 1'
+    opt :warning, 'Success/failure value will be set to 2'
+    opt :unknown, 'Success/failure value will be set to 3'
+    conflicts :ok, :error, :warning, :unknown
+  end
+
+  unless opts[:ok] || opts[:error] || opts[:warning] || opts[:unknown]
+    Trollop::die :ok, 'or one of the other success/failure flags must be used'
+  end
+  opts
+end
+
+
+if $0 == __FILE__
+  opts = parse_opts
+  value = parse_value(opts)
+
+  DucksboardJson::DucksboardJson.new(opts[:application], opts[:job], value).write
+end
