@@ -5,8 +5,9 @@ module DucksboardJson
   class DucksboardJson
 
     def initialize(application, job, value, options={})
-      @application = application
       @job = job
+      @dir = options.fetch(:dir, nil)
+      @dir ||= "/tmp/ducksboard_json/#{application}"
 
       @json = {
         'value' => value,
@@ -16,7 +17,7 @@ module DucksboardJson
     end
 
     def write
-      filename = "/tmp/ducksboard_json/#{@application}/#{@job}.json"
+      filename = "#{@dir}/#{@job}.json"
       FileUtils.mkdir_p(File.dirname(filename))
 
       File.open(filename, 'w') do |f|
