@@ -51,14 +51,12 @@ def parse_opts
 end
 
 
-if $0 == __FILE__
-  opts = parse_opts
-  value = parse_value(opts)
+opts = parse_opts
+value = parse_value(opts)
 
-  DucksboardJson::DucksboardJson.new(
-    opts[:application],
-    opts[:job],
-    value,
-    :dir => opts[:dir],
-  ).write
-end
+DucksboardJson::DucksboardJson.new(
+  opts[:application],
+  opts[:job],
+  value,
+  :dir => opts[:dir],
+).write
