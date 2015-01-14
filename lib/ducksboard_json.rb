@@ -11,7 +11,7 @@ module DucksboardJson
 
       @json = {
         'value' => value,
-        'completion_time' => Time.now.to_i,
+        'timestamp' => Time.now.to_i,
         'application' => application
       }.to_json 
     end
